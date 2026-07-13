@@ -298,4 +298,5 @@ crash.*.log
 terraform.tfvars
 *.tfvars
 data/public_it_tickets.csv
-data/RT Ticket Dataset - Sheet1.csv
+data/combined_ticket.csv
+data/synthetic_tickets.csv
