@@ -300,3 +300,4 @@ terraform.tfvars
 data/public_it_tickets.csv
 data/combined_ticket.csv
 data/synthetic_tickets.csv
+sklearn-env
