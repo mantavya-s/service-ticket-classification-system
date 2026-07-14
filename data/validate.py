@@ -2,6 +2,7 @@ import re
 import pandas as pd
 
 DATA_FILE = "combined_ticket.csv"
+OUTPUT_FILE = "validation_output.txt"
 
 EXPECTED_COLUMNS = ["Ticket ID", "Category", "Subcategory", "Priority", "Description", "Source"]
 VALID_CATEGORIES = {"Hardware", "Software", "Access", "Security", "Network"}
@@ -67,27 +68,24 @@ def validate():
     print_results(error, warning)
 
 def print_results(errors, warnings):
-    print("")
-    print("Validation Results")
-    print("")
-    if errors:
-        print("Errors:-")
-        print("")
-        for error in errors:
-            print(error)
-            print("")
-    else:
-        print("No errors found")
-        print("")
-    
-    if warnings:
-        print("Warnings:-")
-        print("")
-        for warning in warnings:
-            print(warning)
-            print("")
-    else:
-        print("No warnings found")
+    with open(OUTPUT_FILE, "w") as file:
+        file.write("")
+        file.write("Validation Results\n")
+        if errors:
+            file.write("Errors:-\n")
+            for error in errors:
+                file.write(error)
+                file.write("\n")
+        else:
+            file.write("No errors found\n")
+        
+        if warnings:
+            file.write("Warnings:-\n")
+            for warning in warnings:
+                file.write(warning)
+                file.write("\n")
+        else:
+            file.write("No warnings found")
 
 if __name__ == "__main__":
     validate()
