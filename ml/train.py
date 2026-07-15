@@ -2,10 +2,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.pipeline import Pipeline
 from pathlib import Path
 import pandas as pd
+import joblib
 
 DATA_FILE = Path("data/combined_ticket.csv")
+MODEL_DIR = Path("models")
 
 df = pd.read_csv(DATA_FILE, dtype=str).fillna("")
 X = df['Subcategory'] + ' ' + df['Description']
@@ -19,23 +22,24 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y
 )
 
-vectorizer = TfidfVectorizer(
-    sublinear_tf=True, 
-    max_df = 0.9, 
-    min_df = 2, 
-)
+category_classifier = Pipeline([
+    ('vectorizer', TfidfVectorizer(
+        sublinear_tf=True, 
+        max_df = 0.9, 
+        min_df = 2, 
+        ngram_range=(1,2)
+    )),
+    ('model', LogisticRegression(max_iter=1000))
+])
 
-X_train_tfidf = vectorizer.fit_transform(X_train)
-X_test_tfidf = vectorizer.transform(X_test)
+category_classifier.fit(X_train, y_train)
+predictions = category_classifier.predict(X_test)
 
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train_tfidf, y_train)
-
-predictions = model.predict(X_test_tfidf)
 print(f"Accuracy: {accuracy_score(y_test, predictions)}")
 print(classification_report(y_test, predictions))
 
 new_texts = ["VPN Connection Issue user cannot connect to VPN even after changing their password and updating the application"]
-new_text_tfidf = vectorizer.transform(new_texts)
-new_predictions = model.predict(new_text_tfidf)
+new_predictions = category_classifier.predict(new_texts)
 print("predictions for new text: ", new_predictions)
+
+joblib.dump(category_classifier, MODEL_DIR / "ticket_classifier_split_v1.joblib")
