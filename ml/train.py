@@ -9,6 +9,7 @@ import joblib
 
 DATA_FILE = Path("data/combined_ticket.csv")
 MODEL_DIR = Path("models")
+MODEL_DIR.mkdir(exist_ok=True)
 
 df = pd.read_csv(DATA_FILE, dtype=str).fillna("")
 X = df['Subcategory'] + ' ' + df['Description']
