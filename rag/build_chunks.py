@@ -22,5 +22,10 @@ def get_title(file: str, file_path: Path) -> str:
 
     if title:
         return title.group(1).strip()
-    return ""
+    return file_path.stem.replace("_", " ").title()
+
+# function to find other sections in the file
+def get_sections(file: str, section_name: str) -> str:
+    section_pattern = rf"^##\s+{re.escape(section_name)}\s*$\n(.*?)(?=~##\s+|\Z)"
+    section = re.search(section_pattern, file, re.MULTILINE | re.DOTALL)
 
