@@ -15,5 +15,12 @@ KNOW_BASE_DIR = Path("knowledge_base")
 def normalize(text: str) -> str:
     return re.sub(r"[^a-z0-9]", "_", text.lower()).strip("_")
 
-def 
+# function to find and return the title (recognized by a piece of text with a leading #)
+def get_title(file: str, file_path: Path) -> str:
+    title_pattern = r"^#\s+(.+)$"
+    title = re.search(title_pattern, file, re.MULTILINE)
+
+    if title:
+        return title.group(1).strip()
+    return ""
 
