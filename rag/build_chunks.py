@@ -11,5 +11,9 @@ import re
 
 KNOW_BASE_DIR = Path("knowledge_base")
 
+# function to replace delimiters in a string with underscores. 
 def normalize(text: str) -> str:
-    return re.sub(r"[^a-z0-9]", "_", text.lower()).strip(_)
+    return re.sub(r"[^a-z0-9]", "_", text.lower()).strip("_")
+
+def 
+
