@@ -1,16 +1,9 @@
-# things to do:
-# create an object that looks like: chunk_id, file_name, title, category, section, chunk_text, embedding
-# Use sentence transformer MiniLM to convert the documents in knowledge base to chunks
-# loop through each file and convert each section in the file to a chunk_id
-# Use regex to identify sections (split by section headings)
-# Create an embedding per section
-# store the embedding plus all the aforementioned data together
-
 from pathlib import Path 
 import re
 from sentence_transformers import SentenceTransformer 
 
 KNOW_BASE_DIR = Path("knowledge_base")
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 # function to replace delimiters in a string with underscores. 
 def normalize(text: str) -> str:
@@ -27,7 +20,7 @@ def get_title(file: str, file_path: Path) -> str:
 
 # function to find other sections in the file
 def get_section(file: str, section_name: str) -> str:
-    section_pattern = rf"^##\s+{re.escape(section_name)}\s*$\n(.*?)(?=~##\s+|\Z)"
+    section_pattern = rf"^##\s+{re.escape(section_name)}\s*$\n(.*?)(?=^##\s+|\Z)"
     section = re.search(section_pattern, file, re.MULTILINE | re.DOTALL)
 
     if section:
@@ -52,16 +45,16 @@ def chunk_file(file_path: Path) -> list[dict]:
         if not section_text:
             continue
 
-        chunk_id = f"{file_path.stem()}__{normalize(title)}__{i}"
+        chunk_id = f"{file_path.stem}__{normalize(title)}__{normalize(section)}__{i}"
 
-        embedding_text = f""""
-            Title: {title}
-            Category: {category}
-            Subcategory: {subcategory}
-            Section: {section}
+        embedding_text = f"""
+Title: {title}
+Category: {category}
+Subcategory: {subcategory}
+Section: {section}
 
-            {section_text}
-        """.strip()
+{section_text}
+""".strip()
         
         chunks.append({
             "chunk_id": chunk_id,
@@ -88,5 +81,38 @@ def  build_all_chunks() -> list[dict]:
 
     return all_chunks
 
+def main():
+    chunks = build_all_chunks()
+
+    if not chunks:
+        print("No Chunks bruh")
+        return
+
+    print(f"Created {len(chunks)} chunks from {KNOW_BASE_DIR}")
+    model = SentenceTransformer(MODEL_NAME)
+
+    to_embed = [chunk["embedding_text"] for chunk in chunks]
+
+    embeddings = model.encode(
+        to_embed,
+        normalize_embeddings=True
+    )
+
+    for chunk, embedding in zip(chunks, embeddings):
+        chunk["embedding"] = embedding.tolist()
+
+    first = chunks[0]
+
+    print("\nFirst Chunk Info\n")
+    print(f"Chunk ID: {first['chunk_id']}\n")
+    print(f"File: {first['file_name']}\n")
+    print(f"Title: {first['title']}\n")
+    print(f"Category: {first['category']}\n")
+    print(f"Subcategory: {first['subcategory']}\n")
+    print(f"Section: {first['section']}\n")
+    print(f"Embedding length: {len(first['embedding'])}\n")
+
+if __name__ == "__main__":
+    main()
 
 
