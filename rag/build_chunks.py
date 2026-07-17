@@ -8,6 +8,7 @@
 
 from pathlib import Path 
 import re
+from sentence_transformers import SentenceTransformer 
 
 KNOW_BASE_DIR = Path("knowledge_base")
 
@@ -25,7 +26,56 @@ def get_title(file: str, file_path: Path) -> str:
     return file_path.stem.replace("_", " ").title()
 
 # function to find other sections in the file
-def get_sections(file: str, section_name: str) -> str:
+def get_section(file: str, section_name: str) -> str:
     section_pattern = rf"^##\s+{re.escape(section_name)}\s*$\n(.*?)(?=~##\s+|\Z)"
     section = re.search(section_pattern, file, re.MULTILINE | re.DOTALL)
+
+    if section:
+        return section.group(1).strip()
+    return ""
+
+def chunk_file(file_path: Path) -> list[dict]:
+    with open(file_path, "r", encoding="utf-8") as file:
+        content = file.read()
+    
+    title = get_title(content, file_path)
+    category = get_section(content, "Category")
+    subcategory = get_section(content, "Subcategory")
+    sections = ["Symptoms", "Likely Causes", "Troubleshooting Steps", "Escalation Notes", "Suggested Ticket Comment"]
+
+    chunks = []
+
+    for i, section in enumerate(sections):
+        section_text = get_section(content, section)
+
+        if not section_text:
+            continue
+
+        chunk_id = f"{file_path.stem()}__{normalize(title)}__{i}"
+
+        embedding_text = f""""
+            Title: {title}
+            Category: {category}
+            Subcategory: {subcategory}
+            Section: {section}
+
+            {section_text}
+        """.strip()
+        
+        chunks.append({
+            "chunk_id": chunk_id,
+            "file_name": file_path.name,
+            "file_path": str(file_path),
+            "title": title,
+            "category": category,
+            "subcategory": subcategory,
+            "section": section,
+            "chunk_index": i,
+            "chunk_text": section_text,
+            "embedding_text": embedding_text
+        })
+
+    return chunks
+
+
 
