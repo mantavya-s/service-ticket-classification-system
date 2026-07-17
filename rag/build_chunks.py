@@ -34,6 +34,7 @@ def get_section(file: str, section_name: str) -> str:
         return section.group(1).strip()
     return ""
 
+# function to create chunks of the file by each section and create metadata which will be stored with teh embedding
 def chunk_file(file_path: Path) -> list[dict]:
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
@@ -76,6 +77,16 @@ def chunk_file(file_path: Path) -> list[dict]:
         })
 
     return chunks
+
+# Function to iterate over all files in the knowledge base and create chunks
+def  build_all_chunks() -> list[dict]:
+    all_chunks = []
+
+    for file_path in KNOW_BASE_DIR.glob("*.md"):
+        file_chunks = chunk_file(file_path)
+        all_chunks.extend(file_chunks)
+
+    return all_chunks
 
 
 
