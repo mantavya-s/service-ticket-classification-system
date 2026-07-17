@@ -81,7 +81,7 @@ def  build_all_chunks() -> list[dict]:
 
     return all_chunks
 
-def main():
+def build_embeddings() -> list[dict]:
     chunks = build_all_chunks()
 
     if not chunks:
@@ -101,6 +101,11 @@ def main():
     for chunk, embedding in zip(chunks, embeddings):
         chunk["embedding"] = embedding.tolist()
 
+    return chunks
+
+def main():
+    chunks = build_embeddings()
+
     first = chunks[0]
 
     print("\nFirst Chunk Info\n")
@@ -111,6 +116,7 @@ def main():
     print(f"Subcategory: {first['subcategory']}\n")
     print(f"Section: {first['section']}\n")
     print(f"Embedding length: {len(first['embedding'])}\n")
+
 
 if __name__ == "__main__":
     main()
