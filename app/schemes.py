@@ -7,3 +7,7 @@ class TicketRequest(BaseModel):
 class TicketResponse(BaseModel):
     prediction: str
     confidence: float
+
+class RetrieveRequest(BaseModel):
+    text: str
+    limit: int = 3
