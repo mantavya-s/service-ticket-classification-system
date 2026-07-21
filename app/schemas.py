@@ -12,3 +12,13 @@ class TicketRequest(BaseModel):
     subcategory: str
     priority: Priority
     description: str | None = None
+
+class Category(str, Enum):
+    hardware = "Hardware"
+    software = "Software"
+    access = "Access"
+    network = "Network"
+    security = "Security"
+
+class TicketReview(BaseModel):
+    confirmed_category: Category
