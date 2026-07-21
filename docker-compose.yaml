@@ -19,7 +19,7 @@ services:
     container_name: project3-api
     environment:
       DB_HOST: db
-      DB_PORT: 5432
+      DB_PORT: "5432"
       DB_USER: "${DB_USER}"
       DB_PASSWORD: "${DB_PASSWORD}"
       DB_NAME: "${DB_NAME}"
@@ -38,6 +38,23 @@ services:
     volumes:
       - ./data/combined_ticket.csv:/app/data/combined_ticket.csv:ro
       - ./models:/app/models
+
+  insert:
+    build:
+      context: .
+      dockerfile: rag/Dockerfile
+    container_name: project3-insert-data
+    environment:
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_NAME: "${DB_NAME}"
+      DB_HOST: db
+      DB_PORT: "5432"
+    volumes:
+      - ./knowledge_base:/app/knowledge_base:ro
+    depends_on:
+      - db
+
 
 volumes:
   vector_data:
