@@ -29,6 +29,15 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    
+  train:
+    build:
+      context: .
+      dockerfile: ml/Dockerfile
+    container_name: project3-train
+    volumes:
+      - ./data/combined_ticket.csv:/app/data/combined_ticket.csv:ro
+      - ./models:/app/models
 
 volumes:
   vector_data:
