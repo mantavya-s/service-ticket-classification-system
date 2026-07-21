@@ -16,6 +16,7 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
+    container_name: project3-api
     environment:
       DB_HOST: db
       DB_PORT: 5432
