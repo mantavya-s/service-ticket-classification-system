@@ -1,7 +1,8 @@
-from fastapi import FastAPI
-from app.schemas import TicketRequest, Priority
+from fastapi import FastAPI, HTTPException
+from app.schemas import TicketRequest, Priority, Category, TicketReview
 from app.predict import predict_ticket
 from app.insert_user_data import insert_data
+from app.update_ticket import update_data
 from rag.retrieve import retrieve as similarity_search
 
 app = FastAPI()
@@ -34,4 +35,21 @@ def analyze_ticket(request: TicketRequest):
         "Confidence": confidence,
         "Similar Docs": similar
     }
-    
+
+@app.patch("/tickets/{ticket_id}/review")
+def review_ticket(ticket_id: str, review: TicketReview):
+    ticket_found = update_data(
+        ticket_id = ticket_id,
+        confirmed_category = review.confirmed_category.value
+    )
+    if not ticket_found:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Ticket '{ticket_id}' not found."
+        )
+
+        return {
+            "ticket_id": ticket_id,
+            "confirmed_category": review.confirmed_category.value,
+            "reviewed": True,
+        }
