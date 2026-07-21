@@ -49,8 +49,15 @@ try:
         )
         VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (chunk_id) DO UPDATE SET
-                chunk_text = EXCLUDED.chunk_text,
-                embedding = EXCLUDED.embedding;
+            file_name = EXCLUDED.file_name,
+            file_path = EXCLUDED.file_path,
+            title = EXCLUDED.title,
+            category = EXCLUDED.category,
+            subcategory = EXCLUDED.subcategory,
+            section = EXCLUDED.section,
+            chunk_index = EXCLUDED.chunk_index,
+            chunk_text = EXCLUDED.chunk_text,
+            embedding = EXCLUDED.embedding;
         """, (
             row["chunk_id"],
             row["file_name"],
