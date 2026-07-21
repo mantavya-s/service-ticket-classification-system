@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from app.schemes import TicketRequest, TicketResponse, RetrieveRequest
+from app.schemas import TicketRequest, Priority
 from app.predict import predict_ticket
+from app.insert_user_data import insert_data
 from rag.retrieve import retrieve as similarity_search
 
 app = FastAPI()
@@ -9,24 +10,28 @@ app = FastAPI()
 async def root():
     return{"message": "Hello World!"}
 
-@app.post("/predict/")
-async def predict_item(request: TicketRequest):
+@app.post("/analyze-ticket/")
+def analyze_ticket(request: TicketRequest):
     category, confidence = predict_ticket(
         request.subcategory,
         request.description
     )
+    text = f"{request.subcategory}. {request.description or ''}"
+    similar = similarity_search(text)
 
-    return{
+    insert_data(
+        ticket_id=request.ticket_id,
+        subcategory=request.subcategory,
+        priority=request.priority.value,
+        description=request.description,
+        predicted_category=str(category),
+        predicted_confidence=float(confidence)
+    )
+
+    return {
+        "query": text,
         "Category": category,
-        "Confidence": confidence
-    }
-
-@app.post("/retrieve/")
-async def retrieve(request: RetrieveRequest):
-    results = similarity_search(request.text, request.limit)
-
-    return{
-        "query": request.text,
-        "results": results
+        "Confidence": confidence,
+        "Similar Docs": similar
     }
     
