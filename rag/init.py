@@ -71,6 +71,21 @@ try:
             row["embedding"]
         ))
 
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS tickets (
+        ticket_id TEXT PRIMARY KEY,
+        subcategory TEXT NOT NULL,
+        priority TEXT NOT NULL
+            CHECK (priority IN ('Low', 'Medium', 'High', 'Critical')),
+        description TEXT,
+        predicted_category TEXT NOT NULL,
+        predicted_confidence DOUBLE PRECISION,
+        confirmed_category TEXT,
+        source TEXT NOT NULL DEFAULT 'Production',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     conn.commit()
     cur.close()
     conn.close()
