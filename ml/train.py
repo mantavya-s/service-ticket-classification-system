@@ -43,4 +43,4 @@ new_texts = ["VPN Connection Issue user cannot connect to VPN even after changin
 new_predictions = category_classifier.predict(new_texts)
 print("predictions for new text: ", new_predictions)
 
-joblib.dump(category_classifier, MODEL_DIR / "ticket_classifier_split_v1.joblib")
+joblib.dump(category_classifier, MODEL_DIR / "ticket_classifier_split_v3.joblib")
