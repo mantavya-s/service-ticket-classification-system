@@ -12,4 +12,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ml/ ./ml/
 
-CMD ["python3", "-m", "ml.train"]
+RUN chmod +x /app/ml/combine_train.sh
+
+CMD ["/app/ml/combine_train.sh"]
